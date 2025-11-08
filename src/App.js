@@ -26,7 +26,7 @@ function App() {
 
   const detectMoodFromImage = async (imageData) => {
     try {
-      const response = await axios.post("http://localhost:3000/analyze-mood", { image: imageData });
+      const response = await axios.post("https://vibebeats-backend.onrender.com/analyze-mood", { image: imageData });
       const mood = response.data.mood || "neutral";
       setDetectedMood(mood);
       setSelectedGenre(moodToGenre[mood] || "pop");
@@ -44,7 +44,7 @@ function App() {
   useEffect(() => {
     const fetchSongs = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/recommendations", { params: { genre: selectedGenre } });
+        const response = await axios.get("https://vibebeats-backend.onrender.com/recommendations", { params: { genre: selectedGenre } });
         console.log("Fetched songs:", response.data);
         setRecommendedSongs(response.data);
       } catch (err) {
