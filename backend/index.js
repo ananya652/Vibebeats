@@ -2,23 +2,25 @@ import express from "express";
 import axios from "axios";
 import dotenv from "dotenv";
 import cors from "cors";
+import { detectMood } from "./vision.js";
+import bodyParser from "body-parser";
 
 dotenv.config();
 const app = express();
 app.use(cors());
-app.use(express.json());
+
+app.use(bodyParser.json({ limit: "50mb" }));
+app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
 
 const clientId = process.env.SPOTIFY_CLIENT_ID;
 const clientSecret = process.env.SPOTIFY_CLIENT_SECRET;
 
-// Validate environment variables
 if (!clientId || !clientSecret) {
   console.error("❌ Missing Spotify credentials in environment variables");
   console.error("Make sure SPOTIFY_CLIENT_ID and SPOTIFY_CLIENT_SECRET are set in your .env file");
   process.exit(1);
 }
 
-// Token caching
 let accessToken = null;
 let tokenExpiry = null;
 
@@ -52,14 +54,13 @@ const getAccessToken = async () => {
   }
 };
 
-// Genre to search query mapping
 const genreSearchQueries = {
-  "pop": "pop hits",
+  "pop": "pop hits 2024",
   "rock": "rock music",
   "hip-hop": "hip hop rap",
   "electronic": "electronic dance",
   "jazz": "jazz smooth",
-  "classical": "classical orchestral",
+  "classical": "classical music",
   "indie": "indie alternative",
   "country": "country music",
   "r-n-b": "r&b soul",
@@ -76,8 +77,19 @@ const genreSearchQueries = {
   "happy": "happy upbeat",
   "sad": "sad emotional",
   "chill": "chill relax",
-  "party": "party music"
+  "party": "party music",
+  "desi": "bollywood hindi songs",
+  "bollywood": "bollywood hits",
+  "indian": "indian music"
 };
+
+// Desi/Bollywood playlists (you can add your own playlist IDs here!)
+const desiPlaylists = [
+  "1rdnnYryYL6MUxikG4kVZs", // Your custom Bollywood playlist
+  "37i9dQZF1DX0XUfTFmNBRM", // Bollywood Jazz
+  "37i9dQZF1DX1vKzKZ9bRCH", // Desi Indie
+  "37i9dQZF1DX5J7FIl4q56G"  // Bollywood Butter
+];
 
 app.get("/recommendations", async (req, res) => {
   let genre = req.query.genre || "pop";
@@ -86,7 +98,45 @@ app.get("/recommendations", async (req, res) => {
   try {
     const token = await getAccessToken();
     
-    // Map genre to search query
+    // Special handling for desi/bollywood - use playlists
+    if (genre === "desi" || genre === "bollywood" || genre === "indian") {
+      console.log("🇮🇳 Fetching Bollywood songs from curated playlists");
+      
+      // Try each playlist until we find one that works
+      for (const playlistId of desiPlaylists) {
+        try {
+          const response = await axios.get(`https://api.spotify.com/v1/playlists/${playlistId}/tracks`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+            params: {
+              limit: 50,
+              market: "IN",
+              fields: "items(track(id,name,artists,album(images),preview_url,external_urls))"
+            }
+          });
+
+          const tracks = response.data.items
+            .map(item => item.track)
+            .filter(track => track && track.id);
+          
+          if (tracks.length > 0) {
+            // Shuffle the tracks to get random songs each time
+            const shuffled = tracks.sort(() => Math.random() - 0.5);
+            console.log(`✅ Found ${tracks.length} Bollywood tracks from playlist (randomized)`);
+            return res.json(shuffled.slice(0, 3)); // Changed to 3 songs
+          }
+        } catch (err) {
+          console.log(`⚠️ Playlist ${playlistId} failed, trying next...`);
+          continue;
+        }
+      }
+      
+      // Fallback to search if playlists fail
+      console.log("⚠️ All playlists failed, falling back to search");
+    }
+    
+    // Regular search for other genres
     const searchQuery = genreSearchQueries[genre] || genre;
     console.log("🎯 Searching for:", searchQuery);
 
@@ -97,13 +147,21 @@ app.get("/recommendations", async (req, res) => {
       params: {
         q: searchQuery,
         type: "track",
-        limit: 10,
-        market: "IN"
+        limit: 50,
+        market: "US"
       },
     });
 
-    console.log("✅ Successfully got", response.data.tracks.items.length, "tracks");
-    res.json(response.data.tracks.items);
+    // Filter for tracks with preview URLs
+    const tracksWithPreviews = response.data.tracks.items.filter(track => track.preview_url);
+    
+    console.log(`✅ Found ${tracksWithPreviews.length} tracks with previews out of ${response.data.tracks.items.length} total`);
+    
+    // Shuffle and return random songs
+    const allTracks = tracksWithPreviews.length > 0 ? tracksWithPreviews : response.data.tracks.items;
+    const shuffled = allTracks.sort(() => Math.random() - 0.5);
+
+    res.json(shuffled.slice(0, 3));
   } catch (error) {
     console.error("❌ Search error details:");
     console.error("Status:", error.response?.status);
@@ -117,7 +175,6 @@ app.get("/recommendations", async (req, res) => {
   }
 });
 
-// Test endpoint to verify token works
 app.get("/test-token", async (req, res) => {
   try {
     const token = await getAccessToken();
@@ -141,6 +198,21 @@ app.get("/test-token", async (req, res) => {
       error: "Token test failed", 
       details: error.response?.data || error.message 
     });
+  }
+});
+
+app.post("/analyze-mood", async (req, res) => {
+  try {
+    const { image } = req.body;
+    if (!image) return res.status(400).json({ error: "No image provided" });
+
+    const mood = await detectMood(image);
+    console.log("🧠 Mood detected:", mood);
+
+    res.json({ mood });
+  } catch (error) {
+    console.error("❌ Mood detection failed:", error);
+    res.status(500).json({ error: "Mood detection error" });
   }
 });
 

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import "../App.css";
 
 function Upload({ onImageUpload }) {
   const [preview, setPreview] = useState(null);
@@ -10,18 +11,21 @@ function Upload({ onImageUpload }) {
     const reader = new FileReader();
     reader.onloadend = () => {
       setPreview(reader.result);
-      onImageUpload(reader.result); // send image to parent
+      onImageUpload(reader.result);
     };
     reader.readAsDataURL(file);
   };
 
   return (
-    <div>
-      <input type="file" accept="image/*" onChange={handleChange} />
+    <div style={{ marginTop: "1rem", textAlign: "center" }}>
+      <label className="upload-label">
+        Upload Image
+        <input type="file" accept="image/*" onChange={handleChange} />
+      </label>
+
       {preview && (
-        <div>
-          <p>Preview:</p>
-          <img src={preview} alt="Preview" style={{ maxWidth: "300px" }} />
+        <div className="preview-container">
+          <img src={preview} alt="Preview" />
         </div>
       )}
     </div>

@@ -5,6 +5,8 @@
 backend/node_modules/
 /.pnp
 .pnp.js
+backend/vision-key.json
+
 
 # testing
 /coverage
