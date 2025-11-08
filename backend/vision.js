@@ -1,11 +1,23 @@
 import vision from "@google-cloud/vision";
-import dotenv from "dotenv";
 
-dotenv.config();
+// Check if we're on Vercel (production) or local development
+let client;
 
-const client = new vision.ImageAnnotatorClient({
-  keyFilename: process.env.GOOGLE_VISION_KEY_PATH // or use apiKey if you're using that method
-});
+if (process.env.GOOGLE_CREDENTIALS_BASE64) {
+  // Production: decode base64 credentials
+  const credentials = JSON.parse(
+    Buffer.from(process.env.GOOGLE_CREDENTIALS_BASE64, 'base64').toString('utf-8')
+  );
+  
+  client = new vision.ImageAnnotatorClient({
+    credentials: credentials
+  });
+} else {
+  // Local development: use keyfile path from .env
+  client = new vision.ImageAnnotatorClient({
+    keyFilename: process.env.GOOGLE_VISION_KEY_PATH || "vision-key.json"
+  });
+}
 
 // Keywords that indicate Indian/desi context
 const INDIAN_KEYWORDS = [
@@ -28,7 +40,7 @@ export async function detectMood(base64Image) {
         { type: "FACE_DETECTION" },
         { type: "LABEL_DETECTION" },
         { type: "IMAGE_PROPERTIES" },
-        { type: "WEB_DETECTION" } // Helps identify cultural context
+        { type: "WEB_DETECTION" }
       ]
     };
 
@@ -38,7 +50,6 @@ export async function detectMood(base64Image) {
     const labels = result.labelAnnotations || [];
     const webEntities = result.webDetection?.webEntities || [];
     
-    // Combine labels and web entities for detection
     const allDetectedTerms = [
       ...labels.map(l => l.description.toLowerCase()),
       ...webEntities.map(e => e.description?.toLowerCase() || "")
@@ -46,7 +57,6 @@ export async function detectMood(base64Image) {
     
     console.log("🔍 Detected labels:", allDetectedTerms.slice(0, 10));
     
-    // Check if any Indian keywords are present
     const hasIndianContext = allDetectedTerms.some(term => 
       INDIAN_KEYWORDS.some(keyword => term.includes(keyword))
     );
@@ -76,10 +86,7 @@ export async function detectMood(base64Image) {
       }
     }
 
-    // Fallback: Color and label-based mood detection
-    const colors = result.imagePropertiesAnnotation?.dominantColors?.colors || [];
-    
-    // Check labels for context-based moods
+    // Fallback: Context-based mood detection
     const hasPartyLabels = allDetectedTerms.some(term => 
       ['party', 'celebration', 'dance', 'concert', 'nightclub', 'festival'].includes(term)
     );
@@ -100,7 +107,8 @@ export async function detectMood(base64Image) {
     );
     if (hasMusicLabels) return "indie";
 
-    // Color-based mood detection as final fallback
+    // Color-based mood detection
+    const colors = result.imagePropertiesAnnotation?.dominantColors?.colors || [];
     if (colors.length > 0) {
       const dominantColor = colors[0].color;
       const brightness = (dominantColor.red + dominantColor.green + dominantColor.blue) / 3;
