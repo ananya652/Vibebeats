@@ -7,7 +7,10 @@ import bodyParser from "body-parser";
 
 dotenv.config();
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: ['https://vibebeats.vercel.app', 'http://localhost:3000', 'http://localhost:3001'],
+  credentials: true
+}));
 
 app.use(bodyParser.json({ limit: "50mb" }));
 app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
