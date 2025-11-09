@@ -3,6 +3,8 @@ import axios from "axios";
 import Upload from "./components/Upload";
 import "./App.css";
 
+const API_URL = process.env.REACT_APP_API_URL || "http://localhost:3000";
+
 const moodToGenre = {
   joy: "pop",
   happy: "pop",
@@ -26,7 +28,7 @@ function App() {
 
   const detectMoodFromImage = async (imageData) => {
     try {
-      const response = await axios.post("http://localhost:3000/analyze-mood", { image: imageData });
+      const response = await axios.post(`${API_URL}/analyze-mood`, { image: imageData });
       const mood = response.data.mood || "neutral";
       setDetectedMood(mood);
       setSelectedGenre(moodToGenre[mood] || "pop");
@@ -44,7 +46,7 @@ function App() {
   useEffect(() => {
     const fetchSongs = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/recommendations", { params: { genre: selectedGenre } });
+        const response = await axios.get(`${API_URL}/recommendations`, { params: { genre: selectedGenre } });
         console.log("Fetched songs:", response.data);
         setRecommendedSongs(response.data);
       } catch (err) {
