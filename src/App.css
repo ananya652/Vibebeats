@@ -1,4 +1,4 @@
-/* App.css - Black & Yellow Neon Design */
+/* App.css - Minimal Pastel Design */
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
@@ -10,7 +10,7 @@
 
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  background: #000000;
+  background: #f8f9fa;
   min-height: 100vh;
   display: flex;
   justify-content: center;
@@ -19,90 +19,78 @@ body {
 }
 
 .app-container {
-  background: #000000;
-  border: 2px solid #d4ff00;
-  border-radius: 40px;
+  background: white;
+  border-radius: 24px;
   padding: 3rem 2.5rem;
   width: 100%;
   max-width: 900px;
-  animation: fadeIn 0.5s ease;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.06);
 }
 
 /* Header */
 h1 {
   font-size: 2.8rem;
   font-weight: 700;
-  color: #d4ff00;
+  color: #333;
   margin-bottom: 0.5rem;
   text-align: center;
-  letter-spacing: 2px;
+  letter-spacing: -0.5px;
 }
 
 /* Genre selector */
 .genre-select {
   width: 100%;
   max-width: 300px;
-  padding: 1rem 1.5rem;
-  border-radius: 25px;
-  border: 2px solid #d4ff00;
-  background: #000000;
+  padding: 0.9rem 1.2rem;
+  border-radius: 12px;
+  border: 2px solid #b3d9ff;
+  background: white;
   font-size: 1rem;
-  font-weight: 600;
-  color: #d4ff00;
+  font-weight: 500;
+  color: #333;
   margin: 1.5rem auto;
   display: block;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
 }
 
 .genre-select:hover {
-  background: rgba(212, 255, 0, 0.05);
+  border-color: #80bfff;
 }
 
 .genre-select:focus {
   outline: none;
+  border-color: #66b3ff;
 }
 
 .genre-select option {
-  background: #000000;
-  color: #d4ff00;
+  background: white;
+  color: #333;
 }
 
 /* Upload section */
 .upload-label {
   display: block;
   cursor: pointer;
-  background: #d4ff00;
+  background: #fff9b3;
   border: none;
-  color: #000000;
-  padding: 1.5rem 2.5rem;
-  border-radius: 30px;
-  font-weight: 700;
-  font-size: 1.1rem;
-  transition: all 0.3s ease;
+  color: #333;
+  padding: 1.2rem 2.5rem;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: all 0.2s ease;
   text-align: center;
   margin: 2rem auto;
   max-width: 400px;
 }
 
 .upload-label:hover {
-  transform: translateY(-3px);
-  opacity: 0.9;
+  background: #ffe680;
 }
 
 .upload-label:active {
-  transform: translateY(-1px);
+  transform: scale(0.98);
 }
 
 input[type="file"] {
@@ -119,8 +107,8 @@ p {
 }
 
 p strong {
-  color: #d4ff00;
-  font-weight: 700;
+  color: #333;
+  font-weight: 600;
 }
 
 /* Preview container */
@@ -131,8 +119,8 @@ p strong {
 
 .preview-container img {
   max-width: 350px;
-  border-radius: 25px;
-  border: 2px solid #d4ff00;
+  border-radius: 16px;
+  border: 2px solid #ffb3d9;
   object-fit: cover;
 }
 
@@ -151,36 +139,24 @@ p strong {
   align-items: center;
   gap: 1.2rem;
   padding: 1.2rem;
-  border-radius: 25px;
-  background: #000000;
-  border: 2px solid #d4ff00;
-  transition: all 0.3s ease;
-  animation: slideIn 0.4s ease;
-}
-
-@keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: translateX(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
+  border-radius: 16px;
+  background: white;
+  border: 2px solid #f0f0f0;
+  transition: all 0.2s ease;
 }
 
 .song-card:hover {
-  transform: translateY(-3px);
-  background: rgba(212, 255, 0, 0.03);
+  border-color: #e0e0e0;
+  transform: translateY(-2px);
 }
 
 /* Album art */
 .song-card img {
   width: 70px;
   height: 70px;
-  border-radius: 15px;
+  border-radius: 10px;
   object-fit: cover;
-  border: 2px solid #d4ff00;
+  border: 2px solid #b3d9ff;
 }
 
 /* Song info */
@@ -192,9 +168,9 @@ p strong {
 }
 
 .song-info p:first-child {
-  font-weight: 700;
+  font-weight: 600;
   font-size: 1rem;
-  color: #d4ff00;
+  color: #333;
   text-align: left;
   margin: 0;
 }
@@ -202,7 +178,7 @@ p strong {
 .song-info p:last-child {
   font-weight: 500;
   font-size: 0.9rem;
-  color: #888;
+  color: #999;
   text-align: left;
   margin: 0;
 }
@@ -219,27 +195,26 @@ p strong {
   align-items: center;
   gap: 0.5rem;
   padding: 0.7rem 1.3rem;
-  background: #d4ff00;
+  background: #ffccdd;
   border: none;
-  color: #000000;
+  color: #333;
   text-decoration: none;
-  border-radius: 20px;
+  border-radius: 10px;
   font-size: 0.9rem;
-  font-weight: 700;
-  transition: all 0.3s ease;
+  font-weight: 600;
+  transition: all 0.2s ease;
   white-space: nowrap;
 }
 
 .spotify-link:hover {
-  transform: translateY(-2px);
-  opacity: 0.9;
+  background: #ffb3cc;
 }
 
 /* Responsive design */
 @media (max-width: 768px) {
   .app-container {
     padding: 2rem 1.5rem;
-    border-radius: 30px;
+    border-radius: 20px;
   }
 
   h1 {
@@ -274,12 +249,12 @@ p strong {
 
 @media (max-width: 480px) {
   h1 {
-    font-size: 1.6rem;
+    font-size: 1.8rem;
   }
 
   .genre-select,
   .upload-label {
-    font-size: 0.9rem;
-    padding: 1rem 1.5rem;
+    font-size: 0.95rem;
+    padding: 0.9rem 1.5rem;
   }
 }
